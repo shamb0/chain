@@ -24,15 +24,15 @@ runtime-benchmarks = [
 ]
 
 [dependencies]
-frame-benchmarking = { version = "2.0.0-rc6", default-features = false, optional = true }
-frame-support = { version = "2.0.0-rc6", default-features = false }
-frame-system = { version = "2.0.0-rc6", default-features = false }
+frame-benchmarking = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "rococo-branch", optional = true }
+frame-support = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "rococo-branch" }
+frame-system = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "rococo-branch" }
 serde = { version = "1.0.110", optional = true }
 parity-scale-codec = { version = "1.2.0", default-features = false }
-sp-runtime = { version = "2.0.0-rc6", default-features = false }
-sp-io = { version = "2.0.0-rc6", default-features = false }
-sp-std = { version = "2.0.0-rc6", default-features = false }
+sp-runtime = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "rococo-branch" }
+sp-io = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "rococo-branch" }
+sp-std = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "rococo-branch" }
 
 [dev-dependencies]
-pallet-balances = { version = "2.0.0-rc6" }
-sp-core = { version = "2.0.0-rc6", default-features = false }
+pallet-balances = { git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
+sp-core = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "rococo-branch" }
