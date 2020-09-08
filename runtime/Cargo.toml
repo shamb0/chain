@@ -14,22 +14,15 @@ std = [
   "frame-system-rpc-runtime-api/std",
   "pallet-allocations/std",
   "pallet-amendments/std",
-  "pallet-authority-discovery/std",
-  "pallet-authorship/std",
-  "pallet-babe/std",
   "pallet-balances/std",
   "pallet-collective/std",
   "pallet-emergency-shutdown/std",
-  "pallet-grandpa/std",
   "pallet-grants/std",
   "pallet-identity/std",
-  "pallet-im-online/std",
   "pallet-indices/std",
   "pallet-mandate/std",
   "pallet-membership/std",
   "pallet-multisig/std",
-  "pallet-offences/std",
-  "pallet-poa/std",
   "pallet-proxy/std",
   "pallet-randomness-collective-flip/std",
   "pallet-recovery/std",
@@ -37,7 +30,6 @@ std = [
   "pallet-root-of-trust/std",
   "pallet-root-of-trust-runtime-api/std",
   "pallet-scheduler/std",
-  "pallet-session/std",
   "pallet-tcr/std",
   "pallet-timestamp/std",
   "pallet-transaction-payment/std",
@@ -48,8 +40,6 @@ std = [
   "serde",
   "sp-api/std",
   "sp-application-crypto/std",
-  "sp-authority-discovery/std",
-  "sp-consensus-babe/std",
   "sp-block-builder/std",
   "sp-core/std",
   "sp-inherents/std",
@@ -68,22 +58,17 @@ runtime-benchmarks = [
   "frame-system-benchmarking",
   "pallet-allocations/runtime-benchmarks",
   "pallet-amendments/runtime-benchmarks",
-  "pallet-babe/runtime-benchmarks",
   "pallet-balances/runtime-benchmarks",
   "pallet-collective/runtime-benchmarks",
   "pallet-emergency-shutdown/runtime-benchmarks",
-  "pallet-grandpa/runtime-benchmarks",
   "pallet-grants/runtime-benchmarks",
   "pallet-identity/runtime-benchmarks",
   "pallet-indices/runtime-benchmarks",
-  "pallet-im-online/runtime-benchmarks",
   "pallet-multisig/runtime-benchmarks",
-  #"pallet-offences-benchmarking",
   "pallet-proxy/runtime-benchmarks",
   "pallet-reserve/runtime-benchmarks",
   "pallet-root-of-trust/runtime-benchmarks",
   "pallet-scheduler/runtime-benchmarks",
-  #"pallet-session-benchmarking",
   "pallet-tcr/runtime-benchmarks",
   "pallet-timestamp/runtime-benchmarks",
   "pallet-utility/runtime-benchmarks",
@@ -100,23 +85,15 @@ frame-system-rpc-runtime-api = { version = "2.0.0-rc6", default-features = false
 nodle-chain-primitives = { version = "2.0.0-rc6", default-features = false, path = "../primitives" }
 pallet-allocations = { version = "2.0.0-rc6", default-features = false, path = "../pallets/allocations" }
 pallet-amendments = { version = "2.0.0-rc6", default-features = false, path = "../pallets/amendments" }
-pallet-authority-discovery = { version = "2.0.0-rc6", default-features = false }
-pallet-authorship = { version = "2.0.0-rc6", default-features = false }
-pallet-babe = { version = "2.0.0-rc6", default-features = false }
 pallet-balances = { version = "2.0.0-rc6", default-features = false }
 pallet-collective = { version = "2.0.0-rc6", default-features = false }
 pallet-emergency-shutdown = { version = "2.0.0-rc6", default-features = false, path = "../pallets/emergency-shutdown" }
-pallet-grandpa = { version = "2.0.0-rc6", default-features = false }
 pallet-grants = { version = "2.0.0-rc6", default-features = false, path = "../pallets/grants" }
 pallet-identity = { version = "2.0.0-rc6", default-features = false }
-pallet-im-online = { version = "2.0.0-rc6", default-features = false }
 pallet-indices = { version = "2.0.0-rc6", default-features = false }
 pallet-mandate = { version = "2.0.6-rc6", default-features = false }
 pallet-membership = { version = "2.0.0-rc6", default-features = false }
 pallet-multisig = { version = "2.0.0-rc6", default-features = false }
-pallet-offences = { version = "2.0.0-rc6", default-features = false }
-#pallet-offences-benchmarking = { version = "2.0.0-rc6", default-features = false, optional = true }
-pallet-poa = { version = "2.0.0-rc6", default-features = false, path = "../pallets/poa" }
 pallet-proxy = { version = "2.0.0-rc6", default-features = false }
 pallet-randomness-collective-flip = { version = "2.0.0-rc6", default-features = false }
 pallet-recovery = { version = "2.0.0-rc6", default-features = false }
@@ -124,8 +101,6 @@ pallet-reserve = { version = "2.0.0-rc6", default-features = false, path = "../p
 pallet-root-of-trust = { version = "2.0.0-rc6", default-features = false, path = "../pallets/root-of-trust" }
 pallet-root-of-trust-runtime-api = { version = "2.0.0-rc6", default-features = false, path = "../pallets/root-of-trust/rpc/runtime-api" }
 pallet-scheduler = { version = "2.0.0-rc6", default-features = false }
-pallet-session = { version = "2.0.0-rc6", default-features = false, features = ["historical"] }
-#pallet-session-benchmarking = { version = "2.0.0-rc6", default-features = false, optional = true }
 pallet-tcr = { version = "2.0.0-rc6", default-features = false, path = "../pallets/tcr" }
 pallet-timestamp = { version = "2.0.0-rc6", default-features = false }
 pallet-transaction-payment = { version = "2.0.0-rc6", default-features = false }
@@ -136,8 +111,6 @@ safe-mix = { version = "1.0.0", default-features = false }
 serde = { version = "1.0.110", optional = true, features = ["derive"] }
 sp-api = { version = "2.0.0-rc6", default-features = false }
 sp-application-crypto = { version = "2.0.0-rc6", default-features = false }
-sp-authority-discovery = { version = "2.0.0-rc6", default-features = false }
-sp-consensus-babe = { version = "0.8.0-rc6", default-features = false }
 sp-block-builder = { version = "2.0.0-rc6", default-features = false }
 sp-core = { version = "2.0.0-rc6", default-features = false }
 sp-inherents = { version = "2.0.0-rc6", default-features = false }

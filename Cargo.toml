@@ -6,7 +6,6 @@ members = [
 	"pallets/amendments",
 	"pallets/emergency-shutdown",
 	"pallets/grants",
-	"pallets/poa",
 	"pallets/reserve",
 	"pallets/root-of-trust",
 	"pallets/root-of-trust/rpc",
