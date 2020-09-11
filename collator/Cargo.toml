@@ -6,7 +6,7 @@ name = "nodle-chain-collator"
 version = "2.0.0-rc6"
 
 [[bin]]
-name = "nodle-chain"
+name = "nodle-chain-collator"
 path = "src/main.rs"
 
 [features]
