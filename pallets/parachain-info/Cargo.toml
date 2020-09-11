@@ -5,7 +5,7 @@ name = "pallet-parachain-info"
 version = "0.1.0"
 
 [dependencies]
-cumulus-primitives = { git = "https://github.com/paritytech/cumulus",  default-features = false, rev = 'f006b0e1705396107cc6f717251824fa9f5756f8' }
+cumulus-primitives = { git = "https://github.com/paritytech/cumulus",  default-features = false }
 frame-support = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "rococo-branch" }
 frame-system = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "rococo-branch" }
 parity-scale-codec = { version = "1.2.0", default-features = false, features = ["derive"] }
