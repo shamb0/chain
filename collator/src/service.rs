@@ -24,12 +24,15 @@ use cumulus_service::{
     prepare_node_config, start_collator, start_full_node, StartCollatorParams, StartFullNodeParams,
 };
 use nodle_chain_executor::Executor;
+use pallet_root_of_trust_rpc::{RootOfTrust, RootOfTrustApi};
+use pallet_transaction_payment_rpc::{TransactionPayment, TransactionPaymentApi};
 use polkadot_primitives::v0::CollatorPair;
 use sc_informant::OutputFormat;
 use sc_service::{Configuration, PartialComponents, Role, TFullBackend, TFullClient, TaskManager};
 use sp_runtime::traits::BlakeTwo256;
 use sp_trie::PrefixedMemoryDB;
 use std::sync::Arc;
+use substrate_frame_rpc_system::{FullSystem, SystemApi};
 
 /// Starts a `ServiceBuilder` for a full service.
 ///
@@ -170,10 +173,34 @@ pub fn run_node(
             finality_proof_provider: None,
         })?;
 
+    let rpc_extensions_builder = {
+        let client = client.clone();
+        let pool = transaction_pool.clone();
+
+        let rpc_extensions_builder = move |deny_unsafe| {
+            let mut io = jsonrpc_core::IoHandler::default();
+            io.extend_with(SystemApi::to_delegate(FullSystem::new(
+                client.clone(),
+                pool.clone(),
+                deny_unsafe,
+            )));
+            io.extend_with(TransactionPaymentApi::to_delegate(TransactionPayment::new(
+                client.clone(),
+            )));
+            io.extend_with(RootOfTrustApi::to_delegate(RootOfTrust::new(
+                client.clone(),
+            )));
+
+            io
+        };
+
+        Box::new(rpc_extensions_builder)
+    };
+
     sc_service::spawn_tasks(sc_service::SpawnTasksParams {
         on_demand: None,
         remote_blockchain: None,
-        rpc_extensions_builder: Box::new(|_| ()),
+        rpc_extensions_builder,
         client: client.clone(),
         transaction_pool: transaction_pool.clone(),
         task_manager: &mut task_manager,
