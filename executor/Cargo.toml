@@ -5,15 +5,8 @@ authors = ["Eliott Teissonniere <git.eliott@teissonniere.org>"]
 edition = "2018"
 
 [dependencies]
-parity-scale-codec = "1.2.0"
-nodle-chain-primitives = { version = "2.0.0-rc6", path = "../primitives" }
 nodle-chain-runtime = { version = "2.0.0-rc6", path = "../runtime" }
 sc-executor = { git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
-sp-core = { git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
-sp-io = { git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
-sp-state-machine = { git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
-sp-trie = { git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
-trie-root = "0.16.0"
 frame-benchmarking = { git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
 
 [features]
