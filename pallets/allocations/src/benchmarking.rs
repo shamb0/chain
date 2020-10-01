@@ -22,25 +22,36 @@
 
 use super::*;
 
-use frame_benchmarking::{account, benchmarks};
+use frame_benchmarking::{account, benchmarks, whitelisted_caller};
 use frame_system::RawOrigin;
+use sp_runtime::traits::Bounded;
 use sp_std::prelude::*;
 
-const MAX_BYTES: u32 = 1_024;
+const MAXIMUM_EXPECTED_PROOF_SIZE: u32 = 1_024;
 const SEED: u32 = 0;
 
 benchmarks! {
     _ { }
 
     allocate {
-        let u in 1 .. 1000;
-        let b in 1 .. MAX_BYTES;
+        let b in 1 .. MAXIMUM_EXPECTED_PROOF_SIZE;
 
-        let grantee: T::AccountId = account("grantee", u, SEED);
-        let oracle: T::AccountId = account("oracle", u, SEED);
+        let oracle: T::AccountId = whitelisted_caller();
+        let grantee: T::AccountId = account("grantee", 0, SEED);
+
+        let allocation_amount = T::MaximumCoinsEverAllocated::get();
+
+        T::Currency::make_free_balance_be(&oracle, BalanceOf::<T>::max_value());
 
         Module::<T>::initialize_members(&[oracle.clone()]);
-    }: _(RawOrigin::Signed(oracle), grantee, 100.into(), vec![1; b as usize])
+    }: _(RawOrigin::Signed(oracle), grantee.clone(), allocation_amount, vec![1; b as usize])
+    verify {
+        assert_eq!(
+            allocation_amount,
+            <CoinsConsumed<T>>::get(),
+            "Allocation not represented in pallet's storage",
+        );
+    }
 }
 
 #[cfg(test)]
