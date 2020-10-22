@@ -141,7 +141,6 @@ pub fn testnet_genesis(
                 .cloned()
                 .map(|k| (k, ENDOWMENT))
                 .chain(oracles.iter().map(|x| (x.clone(), ENDOWMENT)))
-                .chain(initial_authorities.iter().map(|x| (x.0.clone(), ENDOWMENT)))
                 .chain(roots.iter().map(|x| (x.clone(), ENDOWMENT)))
                 .collect(),
         }),
@@ -210,10 +209,10 @@ pub fn testnet_genesis(
 fn development_config_genesis() -> GenesisConfig {
     testnet_genesis(
         vec![get_authority_keys_from_seed("Alice")],
-        vec![get_account_id_from_seed::<sr25519::Public>("Alice")],
-        vec![get_account_id_from_seed::<sr25519::Public>("Ferdie")],
-        None,
-        None,
+        vec![],
+        vec![],
+        Some(vec![]),
+        Some(vec![]),
     )
 }
 
@@ -243,7 +242,7 @@ fn local_testnet_genesis() -> GenesisConfig {
             get_account_id_from_seed::<sr25519::Public>("Bob"),
             get_account_id_from_seed::<sr25519::Public>("Charlie"),
         ],
-        vec![get_account_id_from_seed::<sr25519::Public>("Ferdie")],
+        vec![],
         None,
         None,
     )
