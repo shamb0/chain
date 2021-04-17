@@ -48,6 +48,7 @@ std = [
   "pallet-transaction-payment-rpc-runtime-api/std",
   "pallet-utility/std",
   "parity-scale-codec/std",
+  "pallet-curveless-staking/std",
   "safe-mix/std",
   "serde",
   "sp-api/std",
