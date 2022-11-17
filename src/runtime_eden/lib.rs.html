@@ -1,0 +1,1004 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `runtimes/eden/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../runtime_eden/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../runtime_eden/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../runtime_eden/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<span id="2">2</span>
+<span id="3">3</span>
+<span id="4">4</span>
+<span id="5">5</span>
+<span id="6">6</span>
+<span id="7">7</span>
+<span id="8">8</span>
+<span id="9">9</span>
+<span id="10">10</span>
+<span id="11">11</span>
+<span id="12">12</span>
+<span id="13">13</span>
+<span id="14">14</span>
+<span id="15">15</span>
+<span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
+<span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
+<span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
+<span id="406">406</span>
+<span id="407">407</span>
+<span id="408">408</span>
+<span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+</pre><pre class="rust"><code><span class="comment">/*
+ * This file is part of the Nodle Chain distributed at https://github.com/NodleCode/chain
+ * Copyright (C) 2020-2022  Nodle International
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
+ */
+
+</span><span class="attribute">#![cfg_attr(not(feature = <span class="string">&quot;std&quot;</span>), no_std)]
+</span><span class="comment">// `construct_runtime!` does a lot of recursion and requires us to increase the limit to 256.
+</span><span class="attribute">#![recursion_limit = <span class="string">&quot;256&quot;</span>]
+
+</span><span class="comment">// Make the WASM binary available.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="macro">include!</span>(<span class="macro">concat!</span>(<span class="macro">env!</span>(<span class="string">&quot;OUT_DIR&quot;</span>), <span class="string">&quot;/wasm_binary.rs&quot;</span>));
+
+<span class="doccomment">/// Wasm binary unwrapped. If built with `SKIP_WASM_BUILD`, the function panics.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">pub fn </span>wasm_binary_unwrap() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[u8] {
+	WASM_BINARY.expect(
+		<span class="string">&quot;Development wasm binary is not available. This means the client is \
+        built with `SKIP_WASM_BUILD` flag and it is only usable for \
+        production chains. Please rebuild with the flag disabled.&quot;</span>,
+	)
+}
+
+<span class="kw">use </span>frame_support::{construct_runtime, weights::Weight};
+<span class="kw">use </span>pallet_transaction_payment::{FeeDetails, RuntimeDispatchInfo};
+<span class="kw">use </span>primitives::{AccountId, Balance, BlockNumber, Hash, Index, Signature};
+<span class="kw">pub use </span>primitives::{AuraId, ParaId};
+<span class="kw">use </span>sp_core::OpaqueMetadata;
+<span class="attribute">#[cfg(any(feature = <span class="string">&quot;std&quot;</span>, test))]
+</span><span class="kw">pub use </span>sp_runtime::BuildStorage;
+<span class="kw">use </span>sp_runtime::{
+	generic,
+	traits::{BlakeTwo256, Block <span class="kw">as </span>BlockT},
+	transaction_validity::{TransactionSource, TransactionValidity},
+	ApplyExtrinsicResult,
+};
+<span class="kw">use </span>sp_std::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span>sp_version::RuntimeVersion;
+
+<span class="kw">pub mod </span>constants;
+<span class="kw">mod </span>implementations;
+<span class="kw">mod </span>migrations;
+<span class="kw">mod </span>pallets_consensus;
+<span class="kw">mod </span>pallets_governance;
+<span class="kw">mod </span>pallets_nodle;
+<span class="kw">mod </span>pallets_parachain;
+<span class="kw">mod </span>pallets_system;
+<span class="kw">mod </span>pallets_util;
+<span class="kw">mod </span>version;
+<span class="kw">mod </span>weights;
+
+<span class="kw">pub use </span>pallets_consensus::SessionKeys;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">pub use </span>version::native_version;
+<span class="kw">pub use </span>version::VERSION;
+
+<span class="macro">construct_runtime! </span>{
+	<span class="kw">pub enum </span>Runtime <span class="kw">where
+		</span>Block = Block,
+		NodeBlock = primitives::Block,
+		UncheckedExtrinsic = UncheckedExtrinsic
+	{
+		<span class="comment">// System
+		</span>System: frame_system = <span class="number">0</span>,
+		Timestamp: pallet_timestamp = <span class="number">1</span>,
+		Balances: pallet_balances = <span class="number">2</span>,
+		TransactionPayment: pallet_transaction_payment = <span class="number">3</span>,
+		RandomnessCollectiveFlip: pallet_randomness_collective_flip = <span class="number">4</span>,
+
+		<span class="comment">// Governance
+		</span>Scheduler: pallet_scheduler::{Pallet, Call, Storage, Event&lt;T&gt;} = <span class="number">10</span>,
+		CompanyReserve: pallet_reserve::&lt;Instance1&gt; = <span class="number">11</span>,
+		InternationalReserve: pallet_reserve::&lt;Instance2&gt; = <span class="number">12</span>,
+		UsaReserve: pallet_reserve::&lt;Instance3&gt; = <span class="number">13</span>,
+		Vesting: pallet_grants = <span class="number">14</span>,
+		Mandate: pallet_mandate::{Pallet, Call, Storage, Event&lt;T&gt;} = <span class="number">15</span>,
+		TechnicalCommittee: pallet_collective::&lt;Instance1&gt; = <span class="number">16</span>,
+		TechnicalMembership: pallet_membership::&lt;Instance3&gt; = <span class="number">17</span>,
+
+		<span class="comment">// Consensus
+		</span>CollatorSelection: pallet_collator_selection::{Pallet, Call, Storage, Event&lt;T&gt;, Config&lt;T&gt;} = <span class="number">19</span>,
+		Authorship: pallet_authorship = <span class="number">20</span>,
+		Session: pallet_session::{Pallet, Call, Storage, Event, Config&lt;T&gt;} = <span class="number">23</span>,
+		Aura: pallet_aura::{Pallet, Config&lt;T&gt;, Storage} = <span class="number">24</span>,
+		AuraExt: cumulus_pallet_aura_ext::{Pallet, Config, Storage} = <span class="number">25</span>,
+
+
+		<span class="comment">// Parachain
+		</span>ParachainSystem: cumulus_pallet_parachain_system = <span class="number">30</span>,
+		ParachainInfo: parachain_info = <span class="number">31</span>,
+		CumulusXcm: cumulus_pallet_xcm = <span class="number">32</span>,
+		DmpQueue: cumulus_pallet_dmp_queue = <span class="number">33</span>,
+		<span class="comment">// XcmpQueue: cumulus_pallet_xcmp_queue::{Pallet, Call, Storage, Event&lt;T&gt;} = 34,
+		// PolkadotXcm: pallet_xcm::{Pallet, Call, Storage, Event&lt;T&gt;, Origin, Config} = 35,
+
+		// Neat things
+		</span>Utility: pallet_utility = <span class="number">40</span>,
+		Multisig: pallet_multisig = <span class="number">41</span>,
+		Uniques: pallet_uniques = <span class="number">42</span>,
+		Preimage: pallet_preimage::{Pallet, Call, Storage, Event&lt;T&gt;} = <span class="number">43</span>,
+
+		<span class="comment">// Nodle Stack
+		// EmergencyShutdown: pallet_emergency_shutdown = 50,
+		</span>Allocations: pallet_allocations = <span class="number">51</span>,
+		AllocationsOracles: pallet_membership::&lt;Instance2&gt; = <span class="number">52</span>,
+
+		<span class="comment">// DAO
+		</span>DaoReserve: pallet_reserve::&lt;Instance4&gt; = <span class="number">60</span>,
+
+		<span class="comment">// Smart Contracts.
+		</span>Contracts: pallet_contracts = <span class="number">62</span>,
+	}
+}
+
+<span class="doccomment">/// The address format for describing accounts.
+</span><span class="kw">pub type </span>Address = sp_runtime::MultiAddress&lt;AccountId, ()&gt;;
+<span class="doccomment">/// Block header type as expected by this runtime.
+</span><span class="kw">pub type </span>Header = generic::Header&lt;BlockNumber, BlakeTwo256&gt;;
+<span class="doccomment">/// Block type as expected by this runtime.
+</span><span class="kw">pub type </span>Block = generic::Block&lt;Header, UncheckedExtrinsic&gt;;
+<span class="doccomment">/// A Block signed with a Justification
+</span><span class="kw">pub type </span>SignedBlock = generic::SignedBlock&lt;Block&gt;;
+<span class="doccomment">/// BlockId type as expected by this runtime.
+</span><span class="kw">pub type </span>BlockId = generic::BlockId&lt;Block&gt;;
+<span class="doccomment">/// The SignedExtension to the basic transaction logic.
+</span><span class="kw">pub type </span>SignedExtra = (
+	frame_system::CheckSpecVersion&lt;Runtime&gt;,
+	frame_system::CheckTxVersion&lt;Runtime&gt;,
+	frame_system::CheckGenesis&lt;Runtime&gt;,
+	frame_system::CheckEra&lt;Runtime&gt;,
+	frame_system::CheckNonce&lt;Runtime&gt;,
+	frame_system::CheckWeight&lt;Runtime&gt;,
+	pallet_transaction_payment::ChargeTransactionPayment&lt;Runtime&gt;,
+);
+<span class="doccomment">/// Unchecked extrinsic type as expected by this runtime.
+</span><span class="kw">pub type </span>UncheckedExtrinsic = generic::UncheckedExtrinsic&lt;Address, Call, Signature, SignedExtra&gt;;
+<span class="doccomment">/// The payload being signed in transactions.
+</span><span class="kw">pub type </span>SignedPayload = generic::SignedPayload&lt;Call, SignedExtra&gt;;
+<span class="doccomment">/// Extrinsic type that has already been checked.
+</span><span class="kw">pub type </span>CheckedExtrinsic = generic::CheckedExtrinsic&lt;AccountId, Call, SignedExtra&gt;;
+
+<span class="doccomment">/// Executive: handles dispatch to the various modules.
+</span><span class="kw">pub type </span>Executive = frame_executive::Executive&lt;
+	Runtime,
+	Block,
+	frame_system::ChainContext&lt;Runtime&gt;,
+	Runtime,
+	AllPalletsWithSystem,
+	migrations::MoveValidatorsSetToInvulnerables,
+&gt;;
+
+<span class="macro">sp_api::impl_runtime_apis! </span>{
+	<span class="kw">impl </span>sp_consensus_aura::AuraApi&lt;Block, AuraId&gt; <span class="kw">for </span>Runtime {
+		<span class="kw">fn </span>slot_duration() -&gt; sp_consensus_aura::SlotDuration {
+			sp_consensus_aura::SlotDuration::from_millis(Aura::slot_duration())
+		}
+
+		<span class="kw">fn </span>authorities() -&gt; Vec&lt;AuraId&gt; {
+			Aura::authorities().into_inner()
+		}
+	}
+
+	<span class="kw">impl </span>sp_session::SessionKeys&lt;Block&gt; <span class="kw">for </span>Runtime {
+		<span class="kw">fn </span>generate_session_keys(seed: <span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt;) -&gt; Vec&lt;u8&gt; {
+			pallets_consensus::SessionKeys::generate(seed)
+		}
+
+		<span class="kw">fn </span>decode_session_keys(
+			encoded: Vec&lt;u8&gt;,
+		) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;(Vec&lt;u8&gt;, sp_core::crypto::KeyTypeId)&gt;&gt; {
+			pallets_consensus::SessionKeys::decode_into_raw_public_keys(<span class="kw-2">&amp;</span>encoded)
+		}
+	}
+
+	<span class="kw">impl </span>sp_api::Core&lt;Block&gt; <span class="kw">for </span>Runtime {
+		<span class="kw">fn </span>version() -&gt; RuntimeVersion {
+			version::VERSION
+		}
+
+		<span class="kw">fn </span>execute_block(block: Block) {
+			Executive::execute_block(block)
+		}
+
+		<span class="kw">fn </span>initialize_block(header: <span class="kw-2">&amp;</span>&lt;Block <span class="kw">as </span>BlockT&gt;::Header) {
+			Executive::initialize_block(header)
+		}
+	}
+
+	<span class="kw">impl </span>sp_api::Metadata&lt;Block&gt; <span class="kw">for </span>Runtime {
+		<span class="kw">fn </span>metadata() -&gt; OpaqueMetadata {
+			OpaqueMetadata::new(Runtime::metadata().into())
+		}
+	}
+
+	<span class="kw">impl </span>sp_block_builder::BlockBuilder&lt;Block&gt; <span class="kw">for </span>Runtime {
+		<span class="kw">fn </span>apply_extrinsic(extrinsic: &lt;Block <span class="kw">as </span>BlockT&gt;::Extrinsic) -&gt; ApplyExtrinsicResult {
+			Executive::apply_extrinsic(extrinsic)
+		}
+
+		<span class="kw">fn </span>finalize_block() -&gt; &lt;Block <span class="kw">as </span>BlockT&gt;::Header {
+			Executive::finalize_block()
+		}
+
+		<span class="kw">fn </span>inherent_extrinsics(data: sp_inherents::InherentData) -&gt; Vec&lt;&lt;Block <span class="kw">as </span>BlockT&gt;::Extrinsic&gt; {
+			data.create_extrinsics()
+		}
+
+		<span class="kw">fn </span>check_inherents(
+			block: Block,
+			data: sp_inherents::InherentData,
+		) -&gt; sp_inherents::CheckInherentsResult {
+			data.check_extrinsics(<span class="kw-2">&amp;</span>block)
+		}
+	}
+
+	<span class="kw">impl </span>sp_transaction_pool::runtime_api::TaggedTransactionQueue&lt;Block&gt; <span class="kw">for </span>Runtime {
+		<span class="kw">fn </span>validate_transaction(
+			source: TransactionSource,
+			tx: &lt;Block <span class="kw">as </span>BlockT&gt;::Extrinsic,
+			block_hash: &lt;Block <span class="kw">as </span>BlockT&gt;::Hash,
+		) -&gt; TransactionValidity {
+			Executive::validate_transaction(source, tx, block_hash)
+		}
+	}
+
+	<span class="kw">impl </span>sp_offchain::OffchainWorkerApi&lt;Block&gt; <span class="kw">for </span>Runtime {
+		<span class="kw">fn </span>offchain_worker(header: <span class="kw-2">&amp;</span>&lt;Block <span class="kw">as </span>BlockT&gt;::Header) {
+			Executive::offchain_worker(header)
+		}
+	}
+
+	<span class="kw">impl </span>frame_system_rpc_runtime_api::AccountNonceApi&lt;Block, AccountId, Index&gt; <span class="kw">for </span>Runtime {
+		<span class="kw">fn </span>account_nonce(account: AccountId) -&gt; Index {
+			System::account_nonce(account)
+		}
+	}
+
+	<span class="kw">impl </span>pallet_transaction_payment_rpc_runtime_api::TransactionPaymentApi&lt;
+		Block,
+		Balance,
+	&gt; <span class="kw">for </span>Runtime {
+		<span class="kw">fn </span>query_info(uxt: &lt;Block <span class="kw">as </span>BlockT&gt;::Extrinsic, len: u32) -&gt; RuntimeDispatchInfo&lt;Balance&gt; {
+			TransactionPayment::query_info(uxt, len)
+		}
+
+		<span class="kw">fn </span>query_fee_details(uxt: &lt;Block <span class="kw">as </span>BlockT&gt;::Extrinsic, len: u32) -&gt; FeeDetails&lt;Balance&gt; {
+			TransactionPayment::query_fee_details(uxt, len)
+		}
+	}
+
+	<span class="kw">impl </span>cumulus_primitives_core::CollectCollationInfo&lt;Block&gt; <span class="kw">for </span>Runtime {
+		<span class="kw">fn </span>collect_collation_info(header: <span class="kw-2">&amp;</span>&lt;Block <span class="kw">as </span>BlockT&gt;::Header) -&gt; cumulus_primitives_core::CollationInfo {
+			ParachainSystem::collect_collation_info(header)
+		}
+	}
+
+	<span class="kw">impl </span>pallet_contracts_rpc_runtime_api::ContractsApi&lt;Block, AccountId, Balance, BlockNumber, Hash&gt;
+		<span class="kw">for </span>Runtime
+	{
+		<span class="kw">fn </span>call(
+			origin: AccountId,
+			dest: AccountId,
+			value: Balance,
+			gas_limit: u64,
+			storage_deposit_limit: <span class="prelude-ty">Option</span>&lt;Balance&gt;,
+			input_data: Vec&lt;u8&gt;,
+		) -&gt; pallet_contracts_primitives::ContractExecResult&lt;Balance&gt; {
+			Contracts::bare_call(
+				origin,
+				dest,
+				value,
+				Weight::from_ref_time(gas_limit),
+				storage_deposit_limit,
+				input_data,
+				constants::CONTRACTS_DEBUG_OUTPUT,
+			)
+		}
+
+		<span class="kw">fn </span>instantiate(
+			origin: AccountId,
+			value: Balance,
+			gas_limit: u64,
+			storage_deposit_limit: <span class="prelude-ty">Option</span>&lt;Balance&gt;,
+			code: pallet_contracts_primitives::Code&lt;Hash&gt;,
+			data: Vec&lt;u8&gt;,
+			salt: Vec&lt;u8&gt;,
+		) -&gt; pallet_contracts_primitives::ContractInstantiateResult&lt;AccountId, Balance&gt; {
+			Contracts::bare_instantiate(
+				origin,
+				value,
+				Weight::from_ref_time(gas_limit),
+				storage_deposit_limit,
+				code,
+				data,
+				salt,
+				constants::CONTRACTS_DEBUG_OUTPUT,
+			)
+		}
+
+		<span class="kw">fn </span>upload_code(
+			origin: AccountId,
+			code: Vec&lt;u8&gt;,
+			storage_deposit_limit: <span class="prelude-ty">Option</span>&lt;Balance&gt;,
+		) -&gt; pallet_contracts_primitives::CodeUploadResult&lt;Hash, Balance&gt; {
+			Contracts::bare_upload_code(origin, code, storage_deposit_limit)
+		}
+
+		<span class="kw">fn </span>get_storage(
+			address: AccountId,
+			key: Vec&lt;u8&gt;,
+		) -&gt; pallet_contracts_primitives::GetStorageResult {
+			Contracts::get_storage(address, key)
+		}
+	}
+
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;runtime-benchmarks&quot;</span>)]
+	</span><span class="kw">impl </span>frame_benchmarking::Benchmark&lt;Block&gt; <span class="kw">for </span>Runtime {
+		<span class="kw">fn </span>benchmark_metadata(extra: bool) -&gt; (
+			Vec&lt;frame_benchmarking::BenchmarkList&gt;,
+			Vec&lt;frame_support::traits::StorageInfo&gt;,
+		) {
+			<span class="kw">use </span>frame_benchmarking::{list_benchmark, Benchmarking, BenchmarkList};
+			<span class="kw">use </span>frame_support::traits::StorageInfoTrait;
+
+			<span class="comment">// Trying to add benchmarks directly to the Session Pallet caused cyclic dependency
+			// issues. To get around that, we separated the Session benchmarks into its own crate,
+			// which is why we need these two lines below.
+			// use pallet_loans_benchmarking::Pallet as LoansBench;
+			</span><span class="kw">use </span>frame_system_benchmarking::Pallet <span class="kw">as </span>SystemBench;
+
+			<span class="kw">let </span><span class="kw-2">mut </span>list = Vec::&lt;BenchmarkList&gt;::new();
+
+			<span class="macro">list_benchmark!</span>(list, extra, frame_system, SystemBench::&lt;Runtime&gt;);
+			<span class="macro">list_benchmark!</span>(list, extra, pallet_timestamp, Timestamp);
+			<span class="macro">list_benchmark!</span>(list, extra, pallet_balances, Balances);
+			<span class="macro">list_benchmark!</span>(list, extra, pallet_scheduler, Scheduler);
+			<span class="macro">list_benchmark!</span>(list, extra, pallet_preimage, Preimage);
+			<span class="macro">list_benchmark!</span>(list, extra, pallet_multisig, Multisig);
+			<span class="macro">list_benchmark!</span>(list, extra, pallet_reserve, CompanyReserve);
+			<span class="macro">list_benchmark!</span>(list, extra, pallet_grants, Vesting);
+			<span class="macro">list_benchmark!</span>(list, extra, pallet_uniques, Uniques);
+			<span class="macro">list_benchmark!</span>(list, extra, pallet_utility, Utility);
+			<span class="macro">list_benchmark!</span>(list, extra, pallet_allocations, Allocations);
+			<span class="macro">list_benchmark!</span>(list, extra, pallet_collator_selection, CollatorSelection);
+			<span class="macro">list_benchmark!</span>(list, extra, pallet_contracts, Contracts);
+			<span class="macro">list_benchmark!</span>(list, extra, pallet_membership, TechnicalMembership);
+
+			<span class="kw">let </span>storage_info = AllPalletsWithSystem::storage_info();
+
+			(list, storage_info)
+		}
+
+		<span class="kw">fn </span>dispatch_benchmark(
+			config: frame_benchmarking::BenchmarkConfig,
+		) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;frame_benchmarking::BenchmarkBatch&gt;, sp_runtime::RuntimeString&gt; {
+			<span class="comment">// We did not include the offences and sessions benchmarks as they are parity
+			// specific and were causing some issues at compile time as they depend on the
+			// presence of the staking and elections pallets.
+
+			</span><span class="kw">use </span>frame_benchmarking::{Benchmarking, BenchmarkBatch, TrackedStorageKey, add_benchmark};
+
+			<span class="kw">use </span>frame_system_benchmarking::Pallet <span class="kw">as </span>SystemBench;
+
+			<span class="kw">impl </span>frame_system_benchmarking::Config <span class="kw">for </span>Runtime {}
+
+			<span class="kw">let </span>whitelist: Vec&lt;TrackedStorageKey&gt; = <span class="macro">vec!</span>[];
+			<span class="kw">let </span><span class="kw-2">mut </span>batches = Vec::&lt;BenchmarkBatch&gt;::new();
+			<span class="kw">let </span>params = (<span class="kw-2">&amp;</span>config, <span class="kw-2">&amp;</span>whitelist);
+
+			<span class="macro">add_benchmark!</span>(params, batches, frame_system, SystemBench::&lt;Runtime&gt;);
+			<span class="macro">add_benchmark!</span>(params, batches, pallet_timestamp, Timestamp);
+			<span class="macro">add_benchmark!</span>(params, batches, pallet_balances, Balances);
+			<span class="macro">add_benchmark!</span>(params, batches, pallet_scheduler, Scheduler);
+			<span class="macro">add_benchmark!</span>(params, batches, pallet_preimage, Preimage);
+			<span class="macro">add_benchmark!</span>(params, batches, pallet_multisig, Multisig);
+			<span class="macro">add_benchmark!</span>(params, batches, pallet_reserve, CompanyReserve);
+			<span class="macro">add_benchmark!</span>(params, batches, pallet_grants, Vesting);
+			<span class="macro">add_benchmark!</span>(params, batches, pallet_uniques, Uniques);
+			<span class="macro">add_benchmark!</span>(params, batches, pallet_utility, Utility);
+			<span class="macro">add_benchmark!</span>(params, batches, pallet_allocations, Allocations);
+			<span class="macro">add_benchmark!</span>(params, batches, pallet_collator_selection, CollatorSelection);
+			<span class="macro">add_benchmark!</span>(params, batches, pallet_contracts, Contracts);
+			<span class="macro">add_benchmark!</span>(params, batches, pallet_membership, TechnicalMembership);
+
+			<span class="kw">if </span>batches.is_empty() { <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;Benchmark not found for this pallet.&quot;</span>.into()) }
+			<span class="prelude-val">Ok</span>(batches)
+		}
+	}
+
+	<span class="attribute">#[cfg(feature = <span class="string">&quot;try-runtime&quot;</span>)]
+	</span><span class="kw">impl </span>frame_try_runtime::TryRuntime&lt;Block&gt; <span class="kw">for </span>Runtime {
+		<span class="kw">fn </span>on_runtime_upgrade() -&gt; (Weight, Weight) {
+			<span class="comment">// NOTE: intentional unwrap: we don&#39;t want to propagate the error backwards, and want to
+			// have a backtrace here. If any of the pre/post migration checks fail, we shall stop
+			// right here and right now.
+			</span><span class="macro">log::debug!</span>(<span class="string">&quot;on_runtime_upgrade&quot;</span>);
+			<span class="kw">let </span>weight = Executive::try_runtime_upgrade().unwrap();
+			(weight, constants::RuntimeBlockWeights::get().max_block)
+		}
+
+		<span class="kw">fn </span>execute_block(block: Block, state_root_check: bool, select: frame_support::traits::TryStateSelect) -&gt; Weight {
+			<span class="macro">log::debug!</span>(<span class="string">&quot;Executive::try_execute_block {block:?}-{state_root_check:?}-{select:?}&quot;</span>);
+			Executive::try_execute_block(block, state_root_check, select).expect(<span class="string">&quot;execute-block failed&quot;</span>)
+		}
+	}
+}
+
+<span class="kw">struct </span>CheckInherents;
+<span class="kw">impl </span>cumulus_pallet_parachain_system::CheckInherents&lt;Block&gt; <span class="kw">for </span>CheckInherents {
+	<span class="kw">fn </span>check_inherents(
+		block: <span class="kw-2">&amp;</span>Block,
+		relay_state_proof: <span class="kw-2">&amp;</span>cumulus_pallet_parachain_system::RelayChainStateProof,
+	) -&gt; sp_inherents::CheckInherentsResult {
+		<span class="kw">let </span>relay_chain_slot = relay_state_proof
+			.read_slot()
+			.expect(<span class="string">&quot;Could not read the relay chain slot from the proof&quot;</span>);
+
+		<span class="kw">let </span>inherent_data = cumulus_primitives_timestamp::InherentDataProvider::from_relay_chain_slot_and_duration(
+			relay_chain_slot,
+			sp_std::time::Duration::from_secs(<span class="number">6</span>),
+		)
+		.create_inherent_data()
+		.expect(<span class="string">&quot;Could not create the timestamp inherent data&quot;</span>);
+
+		inherent_data.check_extrinsics(block)
+	}
+}
+
+<span class="macro">cumulus_pallet_parachain_system::register_validate_block!</span>(
+	Runtime = Runtime,
+	BlockExecutor = cumulus_pallet_aura_ext::BlockExecutor::&lt;Runtime, Executive&gt;,
+	CheckInherents = CheckInherents,
+);
+
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+	<span class="kw">use super</span>::<span class="kw-2">*</span>;
+	<span class="kw">use </span>frame_system::offchain::CreateSignedTransaction;
+
+	<span class="attribute">#[test]
+	</span><span class="kw">fn </span>validate_transaction_submitter_bounds() {
+		<span class="kw">fn </span>is_submit_signed_transaction&lt;T&gt;()
+		<span class="kw">where
+			</span>T: CreateSignedTransaction&lt;Call&gt;,
+		{
+		}
+
+		is_submit_signed_transaction::&lt;Runtime&gt;();
+	}
+
+	<span class="attribute">#[test]
+	#[ignore = <span class="string">&quot;failing due to preimage depency&quot;</span>]
+	</span><span class="kw">fn </span>check_pallet_storage_sizes() {
+		<span class="kw">use </span>frame_support::traits::StorageInfoTrait;
+		<span class="kw">let </span><span class="kw-2">mut </span>storage_info = AllPalletsWithSystem::storage_info();
+		<span class="macro">println!</span>(
+			<span class="string">&quot;| {:^30} | {:^30} | {:^10} | {:^15} |&quot;</span>,
+			<span class="string">&quot;Pallet&quot;</span>, <span class="string">&quot;Storage&quot;</span>, <span class="string">&quot;Max Values&quot;</span>, <span class="string">&quot;Max Size&quot;
+		</span>);
+		<span class="macro">println!</span>(<span class="string">&quot;| {:-&lt;30} | {:-&lt;30} | {:-&lt;10} | {:-&lt;15} |&quot;</span>, <span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>);
+
+		storage_info.sort_by_key(|k| k.max_size);
+		storage_info.reverse();
+
+		<span class="kw">let </span><span class="kw-2">mut </span>failed = <span class="number">0</span>;
+
+		<span class="kw">for </span>info <span class="kw">in </span>storage_info {
+			<span class="kw">let </span>pallet_name = String::from_utf8(info.pallet_name).unwrap();
+			<span class="kw">let </span>storage_name = String::from_utf8(info.storage_name).unwrap();
+			<span class="macro">println!</span>(
+				<span class="string">&quot;| {:&lt;30} | {:&lt;30} | {:&lt;10} | {:&lt;15} |&quot;</span>,
+				pallet_name,
+				storage_name,
+				<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, info.max_values),
+				<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, info.max_size)
+			);
+
+			<span class="kw">if let </span><span class="prelude-val">Some</span>(size) = info.max_size {
+				<span class="comment">// We set the limit for storage size at 4MB
+				</span><span class="kw">if </span>size &gt; <span class="number">4 </span>* <span class="number">1024 </span>* <span class="number">1024 </span>{
+					failed += <span class="number">1</span>;
+				}
+			}
+		}
+
+		<span class="macro">assert!</span>(failed == <span class="number">0</span>, <span class="string">&quot;{} pallets have too big storage&quot;</span>, failed);
+	}
+}
+</code></pre></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="runtime_eden" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

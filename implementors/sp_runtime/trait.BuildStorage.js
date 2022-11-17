@@ -1,0 +1,3 @@
+(function() {var implementors = {
+"runtime_eden":[["impl <a class=\"trait\" href=\"runtime_eden/trait.BuildStorage.html\" title=\"trait runtime_eden::BuildStorage\">BuildStorage</a> for <a class=\"struct\" href=\"runtime_eden/struct.GenesisConfig.html\" title=\"struct runtime_eden::GenesisConfig\">GenesisConfig</a>"]]
+};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

@@ -1,0 +1,1 @@
+window.ALL_CRATES = ["nodle_parachain","pallet_allocations","pallet_grants","pallet_mandate","pallet_reserve","pallet_staking","primitives","runtime_eden","support"];
